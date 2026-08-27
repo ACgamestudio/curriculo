@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Central de Candidaturas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <?!= include('style'); ?>
+</head>
+<body data-theme="dark">
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">CC</span>
+    <div>
+      <h1>Central de Candidaturas</h1>
+      <p class="brand-sub">Disparo individual de currículo por empresa</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="chip" id="chipQuota" title="E-mails que ainda podem ser enviados hoje">cota —</span>
+    <button class="icon-btn" id="btnTheme" aria-label="Alternar tema claro e escuro">◐</button>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab is-active" data-view="compor" role="tab">Compor</button>
+  <button class="tab" data-view="contatos" role="tab">Contatos</button>
+  <button class="tab" data-view="painel" role="tab">Painel</button>
+</nav>
+
+<main>
+
+  <!-- ============ COMPOR ============ -->
+  <section class="view is-active" id="view-compor">
+    <div class="grid-2">
+
+      <div class="col">
+        <article class="card">
+          <h2 class="card-title">Mensagem</h2>
+
+          <div class="row-2">
+            <label class="field">
+              <span>Nome do remetente</span>
+              <input id="fNome" type="text" placeholder="Seu nome completo">
+            </label>
+            <label class="field">
+              <span>E-mail do remetente</span>
+              <select id="fRemetente"></select>
+            </label>
+          </div>
+
+          <label class="field">
+            <span>Responder para (opcional)</span>
+            <input id="fReplyTo" type="email" placeholder="Deixe vazio para usar o remetente">
+          </label>
+
+          <label class="field">
+            <span>Assunto</span>
+            <input id="fAssunto" type="text" placeholder="Candidatura — {{cargo}} — Seu Nome">
+          </label>
+
+          <div class="field">
+            <span>Corpo do e-mail</span>
+            <div class="editor-toolbar">
+              <button type="button" data-cmd="bold" title="Negrito"><b>B</b></button>
+              <button type="button" data-cmd="italic" title="Itálico"><i>I</i></button>
+              <button type="button" data-cmd="underline" title="Sublinhado"><u>U</u></button>
+              <button type="button" data-cmd="insertUnorderedList" title="Lista">•—</button>
+              <button type="button" data-cmd="createLink" title="Inserir link">🔗</button>
+              <button type="button" data-cmd="removeFormat" title="Limpar formatação">✕</button>
+            </div>
+            <div id="fCorpo" class="editor" contenteditable="true"></div>
+          </div>
+
+          <div class="vars">
+            <span class="vars-label">Inserir dado do contato</span>
+            <button type="button" class="var" data-var="nome">{{nome}}</button>
+            <button type="button" class="var" data-var="empresa">{{empresa}}</button>
+            <button type="button" class="var" data-var="cargo">{{cargo}}</button>
+            <button type="button" class="var" data-var="categoria">{{categoria}}</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h2 class="card-title">Currículo em PDF</h2>
+          <div id="anexoVazio" class="dropzone">
+            <input type="file" id="fPdf" accept="application/pdf" hidden>
+            <button class="btn btn-ghost" id="btnEscolherPdf">Escolher PDF</button>
+            <p class="hint">Somente PDF, até <span id="hintMb">20</span> MB. O arquivo fica no seu Drive e é anexado em cada envio.</p>
+          </div>
+          <div id="anexoInfo" class="attach hidden">
+            <span class="attach-icon">PDF</span>
+            <div class="attach-meta">
+              <strong id="anexoNome">—</strong>
+              <small id="anexoTam">—</small>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="btnRemoverPdf">Remover</button>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="fUsarCurriculo" checked>
+            <span>Anexar o currículo nos envios</span>
+          </label>
+        </article>
+      </div>
+
+      <div class="col">
+        <article class="card">
+          <h2 class="card-title">Destinatários</h2>
+
+          <input id="fBusca" class="search" type="search" placeholder="Buscar por empresa ou e-mail">
+
+          <div class="filters" id="filtrosCategoria"></div>
+          <div class="filters">
+            <label class="switch switch-sm"><input type="checkbox" id="fSoPendentes"><span>Só pendentes</span></label>
+            <label class="switch switch-sm"><input type="checkbox" id="fSoNovos"><span>Nunca receberam</span></label>
+          </div>
+
+          <div class="bulk">
+            <button class="btn btn-ghost btn-sm" id="btnTodos">Selecionar todos</button>
+            <button class="btn btn-ghost btn-sm" id="btnNenhum">Desmarcar todos</button>
+            <button class="btn btn-ghost btn-sm" id="btnPreview">Pré-visualizar</button>
+          </div>
+
+          <div class="counters">
+            <div><b id="cTotal">0</b><span>total</span></div>
+            <div><b id="cSel">0</b><span>selecionados</span></div>
+            <div><b id="cEnv" class="ok">0</b><span>enviados</span></div>
+            <div><b id="cFal" class="bad">0</b><span>falhas</span></div>
+            <div><b id="cPen" class="warn">0</b><span>pendentes</span></div>
+          </div>
+
+          <div class="list" id="lista"></div>
+        </article>
+
+        <article class="card">
+          <h2 class="card-title">Disparo</h2>
+          <label class="switch">
+            <input type="checkbox" id="fForcar">
+            <span>Enviar novamente mesmo para quem já recebeu</span>
+          </label>
+          <button class="btn btn-primary btn-block" id="btnEnviar">Enviar e-mails</button>
+
+          <div id="progresso" class="progress-wrap hidden">
+            <div class="progress"><i id="barra"></i></div>
+            <p class="progress-line" id="progressoTexto">—</p>
+            <div class="log" id="log"></div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONTATOS ============ -->
+  <section class="view" id="view-contatos">
+    <div class="grid-2">
+      <article class="card">
+        <h2 class="card-title">Adicionar contato</h2>
+        <div class="row-2">
+          <label class="field"><span>Empresa</span><input id="nEmpresa" type="text"></label>
+          <label class="field"><span>Nome do contato</span><input id="nNome" type="text" placeholder="RH"></label>
+        </div>
+        <label class="field"><span>E-mail</span><input id="nEmail" type="email"></label>
+        <div class="row-2">
+          <label class="field"><span>Categoria</span><input id="nCategoria" type="text" placeholder="TI, RH, Offshore, Engenharia"></label>
+          <label class="field"><span>Cargo</span><input id="nCargo" type="text"></label>
+        </div>
+        <label class="field"><span>Observação</span><input id="nObs" type="text"></label>
+        <button class="btn btn-primary" id="btnAddContato">Adicionar contato</button>
+      </article>
+
+      <article class="card">
+        <h2 class="card-title">Importar CSV</h2>
+        <p class="hint">Primeira linha com os títulos das colunas: <code>Empresa, Nome, Email, Categoria, Cargo</code>. Só <code>Email</code> é obrigatório. E-mails repetidos são ignorados.</p>
+        <input type="file" id="fCsv" accept=".csv,text/csv" hidden>
+        <div class="bulk">
+          <button class="btn btn-ghost" id="btnEscolherCsv">Escolher arquivo CSV</button>
+        </div>
+        <textarea id="csvTexto" class="textarea" rows="7" placeholder="Ou cole o conteúdo do CSV aqui"></textarea>
+        <button class="btn btn-primary" id="btnImportarCsv">Importar contatos</button>
+      </article>
+    </div>
+
+    <article class="card">
+      <h2 class="card-title">Base de contatos</h2>
+      <div class="table-scroll">
+        <table class="table" id="tabelaContatos">
+          <thead><tr><th>ID</th><th>Empresa</th><th>Contato</th><th>E-mail</th><th>Categoria</th><th>Cargo</th><th>Status</th><th>Último envio</th><th>Envios</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ PAINEL ============ -->
+  <section class="view" id="view-painel">
+    <div class="cards-stat" id="cardsStat"></div>
+
+    <div class="grid-2">
+      <article class="card">
+        <h2 class="card-title">Contatos por categoria</h2>
+        <div class="bars" id="bars"></div>
+      </article>
+      <article class="card">
+        <h2 class="card-title">Últimos envios</h2>
+        <div class="table-scroll">
+          <table class="table" id="tabelaHist">
+            <thead><tr><th>Data</th><th>Hora</th><th>Empresa</th><th>E-mail</th><th>Status</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+</main>
+
+<!-- modal -->
+<div class="overlay hidden" id="overlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modalTitulo">Confirmar</h3>
+    <div id="modalCorpo"></div>
+    <div class="modal-acoes">
+      <button class="btn btn-ghost" id="modalCancelar">Cancelar</button>
+      <button class="btn btn-primary" id="modalOk">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<?!= include('script'); ?>
+</body>
+</html>
