@@ -1,4 +1,4 @@
-<style>
+
 :root{
   --cobalt:#2B4BF2;
   --cobalt-soft:rgba(43,75,242,.14);
@@ -261,4 +261,4 @@ input:focus,select:focus,.textarea:focus,.editor:focus{
 .toast.bad{border-left-color:var(--bad)}
 
 @media(prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
-</style>
+

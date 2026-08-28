@@ -1,4 +1,4 @@
-<script>
+
 /* ---------- estado ---------- */
 const S = {
   contatos: [],
@@ -398,4 +398,4 @@ $('fCorpo').innerHTML =
   '<p>Fico à disposição para uma conversa.</p><p>Atenciosamente,<br>[seu nome] — [telefone]</p>';
 
 recarregar();
-</script>
+
